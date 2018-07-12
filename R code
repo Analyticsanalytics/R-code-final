@@ -1,0 +1,917 @@
+# R-code-final
+
+
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/PDEDLGDEL/Measuring Corporate defualt/Cox Proportional Hazard model/Whattodo/final")
+
+data1= read.csv("datanonmissing.csv")
+##data1= na.omit(data1)
+names(data1)
+data1$default1 <- as.factor(data1$default1)
+nrow(data1)
+
+data2= read.csv("rand.csv")
+data2$default1 <- as.factor(data2$default1)
+nrow(data2)
+
+
+
+set.seed(100)
+spl = sample(nrow(data1), 0.5*nrow(data1))
+train = data1[spl,]
+test1 = data1[-spl,]
+spl = sample(nrow(test1), 0.5*nrow(test1))
+test2= test1[spl,]
+test3=test1[-spl,]
+names(train)
+
+
+
+set.seed(100)
+library(randomForest)
+ModelRF1 = randomForest(default1 ~ rr, data=train, nodesize=1,ntree=10)
+
+varImpPlot(ModelRF1)
+summary(ModelRF1)
+##Saving the Model to a file 
+save(file="ModelRF1",ModelRF1)
+
+##Loading the file
+load(file="ModelRF1")
+
+##Scoring New data for the 
+data2$pred <- predict(ModelRF1, newdata=data2, type='response')
+table(data2$default1, data2$pred)
+summary(data2$default1)
+summary(data2$pred)
+
+nrow(train)
+train$predtrain = predict(ModelRF1, newdata=train)
+table(train$default1, train$predtrain)
+test1$predtest1 = predict(ModelRF1, newdata=test1)
+table(test1$default1, test1$predtest1)
+test2$predtest2 = predict(ModelRF1, newdata=test2)
+table(test2$default1, test2$predtest2)
+test3$Predtest3 = predict(ModelRF1, newdata=test3)
+table(test3$Predtest3, test3$default1)
+
+table(data2$default1, data2$pred)
+
+####With all and RR####
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/PDEDLGDEL/Measuring Corporate defualt/Cox Proportional Hazard model/Whattodo/final")
+
+data1= read.csv("datanonmissing.csv")
+##data1= na.omit(data1)
+names(data1)
+data1$default1 <- as.factor(data1$default1)
+nrow(data1)
+
+data2= read.csv("rand.csv")
+data2$default1 <- as.factor(data2$default1)
+nrow(data2)
+
+
+
+set.seed(100)
+spl = sample(nrow(data1), 0.5*nrow(data1))
+train = data1[spl,]
+test1 = data1[-spl,]
+spl = sample(nrow(test1), 0.5*nrow(test1))
+test2= test1[spl,]
+test3=test1[-spl,]
+names(train)
+
+set.seed(123)
+library(randomForest)
+ModelRF2 = randomForest(default1 ~ rr + approved.amount + ownersequityratio + workingcapratio, data=train, nodesize=1,ntree=10)
+varImpPlot(ModelRF2)
+summary(ModelRF2)
+##Saving the Model to a file 
+save(file="ModelRF2",ModelRF2)
+
+##Loading the file
+load(file="ModelRF2")
+
+##Scoring New data for the 
+data2$pred <- predict(ModelRF2, newdata=data2, type='response')
+table(data2$default1, data2$pred)
+summary(data2$default1)
+summary(data2$pred)
+
+nrow(train)
+train$predtrain = predict(ModelRF2, newdata=train)
+table(train$default1, train$predtrain)
+test1$predtest1 = predict(ModelRF2, newdata=test1)
+table(test1$default1, test1$predtest1)
+test2$predtest2 = predict(ModelRF2, newdata=test2)
+table(test2$default1, test2$predtest2)
+test3$Predtest3 = predict(ModelRF2, newdata=test3)
+table(test3$Predtest3, test3$default1)
+
+
+
+table(data2$default1, data2$pred)
+
+
+###d$predefualtt = Preddata
+write.csv(test, "testpredicted.csv", row.names = TRUE)
+
+plot(ModelRF2)
+
+
+# Variable Importance Plot
+varImpPlot(cross.sell.rf,sort = T, main="Variable Importance", n.var=5)
+
+
+#####################################
+
+
+#######################With Equal Sample Size################
+#########Getting Data##########
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/Adhoc clients/navitercapital ROC analysis/Old series")
+data=read.csv("mergedequal.csv")
+df=data.frame(data)
+names(df)
+
+###datafunded BA@funding
+library(Deducer) 
+modelbafunding= glm(chargeoff ~ baaf  , data = df , family = binomial("logit") )
+
+summary(modelbafunding)
+rocplot(modelbafunding)
+df$predbaf = predict.glm(modelbafunding, df, type = c("response"))
+df$predbaf <- ifelse(df$predbaf < 0.5, 0, 1)
+table(df$predbaf)
+table(df$chargeoff, df$predbaf)
+
+###datafunded PCS@funding
+library(Deducer)
+modelpcsfunding= glm(chargeoff ~pcsfunding  , data = df , family = binomial("logit") )
+
+summary(modelpcsfunding)
+rocplot(modelpcsfunding)
+df$predpcsf = predict.glm(modelpcsfunding, df, type = c("response"))
+df$predpcsf <- ifelse(df$predpcsf < 0.5, 0, 1)
+table(df$predpcsf)
+table(df$chargeoff, df$predpcsf)
+
+##############################Based on the cases of the Old series portfolio till Feb 2018#############################
+
+#########Getting Data##########
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/Adhoc clients/navitercapital ROC analysis/Old series")
+data=read.csv("mergedfull.csv")
+df=data.frame(data)
+names(df)
+
+###datafunded BA@funding
+library(Deducer) 
+modelbafunding= glm(chargeoff ~ baaf  , data = df , family = binomial("logit") )
+
+summary(modelbafunding)
+rocplot(modelbafunding)
+df$predbaf = predict.glm(modelbafunding, df, type = c("response"))
+df$predbaf <- ifelse(df$predbaf < 0.5, 0, 1)
+table(df$predbaf)
+table(df$chargeoff, df$predbaf)
+
+###datafunded PCS@funding
+library(Deducer)
+modelpcsfunding= glm(chargeoff ~pcsfunding  , data = df , family = binomial("logit") )
+
+summary(modelpcsfunding)
+rocplot(modelpcsfunding)
+df$predpcsf = predict.glm(modelpcsfunding, df, type = c("response"))
+df$predpcsf <- ifelse(df$predpcsf < 0.5, 0, 1)
+table(df$predpcsf)
+table(df$chargeoff, df$predpcsf)
+
+
+##########################################
+#########Getting Data##########
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+data=read.csv("datanew.csv")
+df=data.frame(data)
+df1=df
+data11=df
+
+###Subset of Data taking relevent coloumns only
+data123 = data11[, c(5,9,10,11,12,13,15,16,18,20)]
+
+
+#############Seed setting to replicate the results#########
+set.seed(123)
+require(caTools)
+split <- sample.split(data123$RR_cat, SplitRatio = 0.70)
+
+###### Dividing into Test and Training set###########
+
+df.train <- subset(df, split == TRUE)
+df.test <- subset(df, split == FALSE)
+
+###SMOTE###
+print(table(data11$RR_cat))
+print(prop.table(table(data11$RR_cat)))
+
+###LETS SMOKE (To remove Class Bias)
+library(DMwR)
+df.train$RR_cat <- as.factor(df.train$RR_cat)
+df.train <- SMOTE(RR_cat ~ ., df.train, perc.over = 100, perc.under=200)
+df.train$RR_cat <- as.numeric(df.train$RR_cat)
+print(table(df.train$RR_cat))
+library(car)
+df.train$RR_cat<-recode(df.train$RR_cat,"1=0")
+df.train$RR_cat<-recode(df.train$RR_cat,"2=1")
+
+##################################################Logistic Regression###############################################
+
+##### Sub Logistic Regression #####
+model1= glm(RR_cat~BA_uw+pcs_uw+dtiratio.At_uw+aob_trt+indrisk.At_uw+cashmargin.At_uw+anurevenue_trt+nsf.At_uw+repymtrisk.At_uw,data = df.train, family = binomial(link= "logit"))
+summary(model1)
+
+###Predicting the test data 
+df.train$predicted.risk = predict(model1, newdata = df.train , type = "response")
+df.test$predicted.risk = predict(model1, newdata=df.test, type="response")
+
+###Testing accuracy
+table(df.train$RR_cat, as.numeric(df.train$predicted.risk >= 0.5))
+table(df.test$RR_cat, as.numeric(df.test$predicted.risk >= 0.5))
+
+###AUC and ROC
+library(ROCR)
+pred = prediction(df.test$predicted.risk, df.test$RR_cat)
+as.numeric(performance(pred, "auc")@y.values)
+
+pred1 = prediction(df.train$predicted.risk, df.train$RR_cat)
+as.numeric(performance(pred1, "auc")@y.values)
+
+# Make predictions on training set
+#predict$df.train = predict(model1, type="response")
+
+# Prediction function
+#ROCRpred = prediction(predictTrain, df.train$RR_cat)
+
+# Performance function
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+# Plot ROC curve
+#plot(ROCRperf)
+
+##Saving the Model to a file 
+save(file="model1",model1)
+
+##Loading the file
+load(file="model1")
+
+##Scoring New data for the 
+df.test$pred <- predict(model1, newdata=df.test, type='response')
+
+
+##Scoring New data for the 
+rejectdatanor$pred <- predict(model1, newdata=rejectdatanor, type='response')
+
+typeof(rejectdatanor$pred)
+
+rejectdatanor$pred<-recode(rejectdatanor$pred,"NA"== ".")
+
+###Making nonmissing data
+sum(is.na(rejectdatanor$pred))
+rejectdatanor1=rejectdatanor[!is.na(rejectdatanor$pred),]
+
+sum(is.na(rejectdatastep$pred))
+rejectdatastep1=rejectdatastep[!is.na(rejectdatastep$pred),]
+
+rejectdatanor1$RR_cat = ifelse(rejectdatanor1$pred>0.5,1,0)
+table(rejectdatanor1$RR_cat)
+
+rejectdatastep1$RR_cat = ifelse(rejectdatastep1$pred>0.5,1,0)
+table(rejectdatastep1$RR_cat)
+
+
+
+###Exporting the Rejected scored data 
+library(xlsx)
+library(ImportExport)
+excel_export(rejectdatanor1, file = "rejectdatanor1.xlsx", table_names = "RejectData")
+
+
+###Getting the merged data to rerun Logistic
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+datanor01=read.csv("mergednor.csv")
+mergednor.df=data.frame(datanor01)
+names(mergednor.df)
+library(Deducer)
+modelmergednor= glm(RR_cat ~ pcs_uw + dtiratio.At_uw + aob_trt + BA_uw + operatingexp_trt + corprisk.At_uw + indrisk.At_uw + cashmargin.At_uw + anurevenue_trt + nsf.At_uw + repymtrisk.At_uw, data = mergednor.df , family = binomial("logit") )
+summary(modelmergednor)
+rocplot(modelmergednor)
+typeof(mergednor.df$RR_cat)
+
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+datastep01=read.csv("mergedstep.csv")
+mergedstep.df=data.frame(datastep01)
+names(mergedstep.df)
+library(Deducer)
+modelmergedstep= glm(RR_cat ~ pcs_uw + dtiratio.At_uw + aob_trt + BA_uw + operatingexp_trt + corprisk.At_uw + indrisk.At_uw + cashmargin.At_uw + anurevenue_trt + nsf.At_uw + repymtrisk.At_uw, data = mergedstep.df , family = binomial("logit") )
+forwards= step(modelmergedstep)
+summary(modelmergedstep)
+rocplot(modelmergedstep)
+typeof(mergedstep.df$RR_cat)
+
+###Exporting the model for scoring
+##Saving the Model to a file 
+save(file="modelmergednor",modelmergednor)
+
+##Loading the file
+load(file="modelmergednor")
+
+###Exporting the model for scoring
+##Saving the Model to a file 
+save(file="modelmergedstep",modelmergedstep)
+
+##Loading the file
+load(file="modelmergedstep")
+
+###Scoring 
+mergednor.df$pred <- predict(modelmergednor, newdata=mergednor.df, type='response')
+typeof(mergednor.df$pred)
+mergednor.df$pred<-recode(mergednor.df$pred,"NA"== ".")
+
+###Making nonmissing data
+sum(is.na(mergednor.df$pred))
+mergednor.df1=mergednor.df[!is.na(mergednor.df$pred),]
+mergednor.df1$RR_catpred = ifelse(mergednor.df1$pred>0.5,1,0)
+
+library(gmodels)
+CrossTable(mergednor.df1$RR_cat, mergednor.df1$RR_catpred)
+
+
+###Scoring Step
+mergedstep.df$pred <- predict(modelmergedstep, newdata=mergedstep.df, type='response')
+typeof(mergedstep.df$pred)
+mergedstep.df$pred<-recode(mergedstep.df$pred,"NA"== ".")
+
+###Making nonmissing data
+sum(is.na(mergedstep.df$pred))
+mergedstep.df1=mergedstep.df[!is.na(mergedstep.df$pred),]
+mergedstep.df1$RR_catpred = ifelse(mergedstep.df1$pred>0.5,1,0)
+library(gmodels)
+CrossTable(mergedstep.df1$RR_cat, mergedstep.df1$RR_catpred)
+
+
+###crosstab(backtesting.df1$RR_cat, backtesting.df1$RR_catpred)
+library(gmodels)
+CrossTable(backtesting.df1$RR_cat, backtesting.df1$RR_catpred)
+
+###Exporting Backtesting scored data
+library(xlsx)
+library(ImportExport)
+excel_export(backtesting.df1, file = "backtestingdata1.xlsx", table_names = "backtestingData")
+
+
+
+###Model Performence
+###Prediction
+merged.df1$predicted.risk = predict(modelmerged1, newdata=merged.df1, type="response")
+###ANOVA
+anova(modelmerged1, test="Chisq")
+##################
+
+merged.df1$RR_cat<-recode(merged.df1$RR_cat,"0=1")
+merged.df1$RR_cat<-recode(merged.df1$RR_cat,"1=2")
+
+merged.df1$pred<-recode(merged.df1$pred,"NA"== ".")
+merged.df1$RR_catpred = ifelse(merged.df1$pred>0.5,1,0)
+
+###psudeo R squared
+library(pscl)
+pR2(model1)
+pR2(modelstep1)
+pR2(modelmergednor)
+pR2(modelmergedstep)
+
+###Accuracy
+table(merged.df$RR_cat, as.numeric(merged.df$predicted.risk >= 0.5))
+
+################################
+#########Getting Data##########
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+data=read.csv("data.csv")
+df=data.frame(data)
+df1=df
+data11=df
+####data2=na.omit(data11)
+
+##Getting Column Index
+colnames(data11)
+
+###Subset of Data
+data123 = data11[, c(5,9,10,11,12,13,15,16,18,20)]
+
+
+### Checking Missing Values in Dataframe ###
+
+table(sapply(merged.df$RR_cat, function(x) sum(is.na(x))))
+table(merged.df$RR_cat)
+sapply(df.train, function(x) sum(is.na(x)))
+sapply(df.test, function(x) sum(is.na(x)))
+
+
+### Headers of coulumn ###
+head(data123)
+str(data123)
+###For Backtesting
+newdata <- data123[1:500,]
+
+
+###Take a random sample of size 50 from a dataset mydata 
+###Sample without replacement
+back_testing <- data123[sample(1:nrow(data123), 500,
+                          replace=FALSE),]
+
+#############Seed setting to replicate the results#########
+set.seed(123)
+require(caTools)
+split <- sample.split(data123$RR_cat, SplitRatio = 0.70)
+
+###### Dividing into Test and Training set###########
+
+df.train <- subset(df, split == TRUE)
+df.test <- subset(df, split == FALSE)
+
+###SMOTE###
+print(table(data11$RR_cat))
+print(prop.table(table(data11$RR_cat)))
+
+###LETS SMOKE
+library(DMwR)
+df.train$RR_cat <- as.factor(df.train$RR_cat)
+df.train <- SMOTE(RR_cat ~ ., df.train, perc.over = 100, perc.under=200)
+df.train$RR_cat <- as.numeric(df.train$RR_cat)
+print(table(df.train$RR_cat))
+library(car)
+df.train$RR_cat<-recode(df.train$RR_cat,"1=0")
+df.train$RR_cat<-recode(df.train$RR_cat,"2=1")
+
+  ##################################################Logistic Regression###############################################
+
+##### Sub Logistic Regression #####
+model1= glm(RR_cat~BA_uw+pcs_uw+dtiratio.At_uw+aob_trt+indrisk.At_uw+cashmargin.At_uw+anurevenue_trt+nsf.At_uw+repymtrisk.At_uw,data = df.train, family = binomial(link= "logit"))
+summary(model1)
+
+###Predicting the test data 
+df.test$predicted.risk = predict(model1, newdata=df.test, type="response")
+df.train$predicted.risk = predict(model1, newdata = df.train , type = "response")
+
+###Testing accuracy
+table(df.test$RR_cat, as.numeric(df.test$predicted.risk >= 0.5))
+table(df.train$RR_cat, as.numeric(df.train$predicted.risk >= 0.5))
+
+###AUC and ROC
+library(ROCR)
+pred = prediction(df.test$predicted.risk, df.test$RR_cat)
+as.numeric(performance(pred, "auc")@y.values)
+
+pred1 = prediction(df.train$predicted.risk, df.train$RR_cat)
+as.numeric(performance(pred1, "auc")@y.values)
+
+# Make predictions on training set
+predict$df.train = predict(model1, type="response")
+
+# Prediction function
+ROCRpred = prediction(predictTrain, df.train$RR_cat)
+
+# Performance function
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+# Plot ROC curve
+plot(ROCRperf)
+
+##Saving the Model to a file 
+save(file="modelfile",model1)
+
+##Loading the file
+load(file="model1")
+
+##Scoring New data for the 
+df.test$pred <- predict(model1, newdata=df.test, type='response')
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+###The stepwise function####
+a#########Getting Data##########
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+data=read.csv("data.csv")
+df=data.frame(data)
+df1=df
+data11=df
+data2=na.omit(data11)
+
+##Getting Column Index
+colnames(data11)
+
+###Subset of Data
+data123 = data11[, c(5,9,10,11,12,13,15,16,18,20)]
+
+
+### Checking Missing Values in Dataframe ###
+sapply(df, function(x) sum(is.na(x)))
+##sapply(df.train, function(x) sum(is.na(x)))
+##sapply(df.test, function(x) sum(is.na(x)))
+
+
+### Headers of coulumn ###
+head(data123)
+str(data123)
+
+
+#############Seed setting to replicate the results#########
+set.seed(123)
+require(caTools)
+split <- sample.split(data123$RR_cat, SplitRatio = 0.70)
+
+###### Dividing into Test and Training set###########
+
+df.train <- subset(df, split == TRUE)
+df.test <- subset(df, split == FALSE)
+
+###SMOTE###
+print(table(data11$RR_cat))
+print(prop.table(table(data11$RR_cat)))
+
+###LETS SMOKE
+library(DMwR)
+df.train$RR_cat <- as.factor(df.train$RR_cat)
+df.train <- SMOTE(RR_cat ~ ., df.train, perc.over = 100, perc.under=200)
+df.train$RR_cat <- as.numeric(df.train$RR_cat)
+print(table(df.train$RR_cat))
+library(car)
+df.train$RR_cat<-recode(df.train$RR_cat,"1=0")
+df.train$RR_cat<-recode(df.train$RR_cat,"2=1")
+
+##################################################Logistic Regression###############################################
+
+##### Sub Logistic Regression #####
+model1= glm(RR_cat~BA_uw+pcs_uw+dtiratio.At_uw+aob_trt+indrisk.At_uw+cashmargin.At_uw+anurevenue_trt+nsf.At_uw+repymtrisk.At_uw,data = df.train, family = binomial(link= "logit"))
+forwards = step(model1)
+summary(model1)
+
+###Predicting the test data 
+df.test$predicted.risk = predict(model1, newdata=df.test, type="response")
+df.train$predicted.risk = predict(model1, newdata = df.train , type = "response")
+
+###Testing accuracy
+table(df.test$RR_cat, as.numeric(df.test$predicted.risk >= 0.5))
+table(df.train$RR_cat, as.numeric(df.train$predicted.risk >= 0.5))
+
+###AUC and ROC
+library(ROCR)
+pred1 = prediction(df.train$predicted.risk, df.train$RR_cat)
+as.numeric(performance(pred1, "auc")@y.values)
+
+
+pred = prediction(df.test$predicted.risk, df.test$RR_cat)
+as.numeric(performance(pred, "auc")@y.values)
+
+################################################################################################################
+# Make predictions on training set
+predict$df.train = predict(model1, type="response")
+
+# Prediction function
+##ROCRpred = prediction(predictTrain, df.train$RR_cat)
+
+# Performance function
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+# Plot ROC curve
+plot(ROCRperf)
+#################################################################################################################
+##Saving the Model to a file 
+save(file="model1",model1)
+
+##Loading the file
+load(file="model1")
+
+###Loading new data for scoring 
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+rejecteddata= read.csv("Rejected cases.csv")
+
+##Scoring New data for the 
+rejecteddata$pred <- predict(model1, newdata=rejecteddata, type='response')
+typeof(rejecteddata$pred)
+rejecteddata$pred<-recode(rejecteddata$pred,"NA"== ".")
+###Making nonmissing data
+sum(is.na(rejecteddata$pred))
+rejectdata1=rejecteddata[!is.na(rejecteddata$pred),]
+#library(plyr)
+#revalue(rejecteddata$pred,  c("NA"=.))
+#rejecteddata$pred <- replace(rejecteddata$pred, is.na(x$a), 0)
+
+#rejecteddata$RR_cat = ifelse(rejecteddata$pred = NA,2," ")
+rejecteddata$RR_cat = ifelse(rejecteddata$pred>0.5,1,0)
+table(rejecteddata$RR_cat)
+
+###Exporting the Rejected scored data 
+library(xlsx)
+library(ImportExport)
+excel_export(rejectdata1, file = "rejecteddata1.xlsx", table_names = "RejectData")
+
+###Getting the merged data to rerun Logistic
+setwd("/home/anand/Documents/BA score reject inference 23082017/attachments")
+data=read.csv("mergeddata.csv")
+merged.df=data.frame(data)
+names(merged.df)
+library(Deducer)
+modelmerged= glm(RR_cat ~ pcs_uw + dtiratio.At_uw + aob_trt + BA_uw + operatingexp_trt + corprisk.At_uw + indrisk.At_uw + cashmargin.At_uw + anurevenue_trt + nsf.At_uw + repymtrisk.At_uw, data = merged.df , family = binomial("logit") )
+forwards= step(modelmerged)
+summary(modelmerged)
+rocplot(modelmerged)
+typeof(merged.df$RR_cat)
+###Exporting the model for scoring
+##Saving the Model to a file 
+save(file="modelmerged",modelmerged)
+
+##Loading the file
+load(file="modelmerged")
+
+####BACKTESTING
+##Scoring New data for the 
+rejecteddata$pred <- predict(model1, newdata=rejecteddata, type='response')
+typeof(rejecteddata$pred)
+rejecteddata$pred<-recode(rejecteddata$pred,"NA"== ".")
+
+
+
+###Model Performence
+###Prediction
+merged.df$predicted.risk = predict(modelmerged, newdata=merged.df, type="response")
+###ANOVA
+anova(modelmerged, test="Chisq")
+##################
+
+merged.df$RR_cat<-recode(merged.df$RR_cat,"0=1")
+merged.df$RR_cat<-recode(merged.df$RR_cat,"1=2")
+#################################################################################################
+library(caret)
+# define training control
+train_control<- trainControl(method="cv", number=10)
+# train the model 
+model<- train(RR_cat ~ pcs_uw + dtiratio.At_uw + aob_trt + BA_uw + operatingexp_trt + corprisk.At_uw + indrisk.At_uw + cashmargin.At_uw + anurevenue_trt + nsf.At_uw + repymtrisk.At_uw, data=merged.df, trControl=train_control, method="glm", na.action = na.exclude ,family=binomial(link = "logit"))
+# print cv scores
+summary(model)
+
+table(merged.df$RR_cat)
+#################################################################################################
+###psudeo R squared
+library(pscl)
+pR2(modelmerged)
+###AUC and ROC
+library(ROCR)
+pred11 = prediction(merged.df$predicted.risk, merged.df$RR_cat)
+as.numeric(performance(pred11, "auc")@y.values)
+
+###Accuracy
+table(merged.df$RR_cat, as.numeric(merged.df$predicted.risk >= 0.5))
+
+
+ 
+
+
+
+
+
+
+
+
+#####################################################################################################
+#############################Getting data for Non-missing cases######################################
+#####################################################################################################
+
+Not Part of the initial code
+
+################################################################################################################
+sum(is.na(rejecteddata$pred))
+
+if(rejecteddata$pred>0.0 && rejecteddata$pred<=0.5){
+  rejecteddata$pred=0
+  
+}else if(rejecteddata$pred>0.5 && rejecteddata$pred<=1.0){
+  rejecteddata$pred=1
+  
+}else if(rejecteddata$pred=="NA"){
+  rejecteddata$pred=3
+}
+############################################
+
+###Getting Data###
+setwd("D:/RCPS/New BA Reject Inference/modelling")
+data=read.csv("data for modelling.csv")
+df=data.frame(data)
+
+head(df)
+
+### Splitting data into Test and Train###
+
+require(caTools)
+set.seed(101) 
+sample = sample.split(df$RR_cat, SplitRatio = .75)
+train.df = subset(df, sample == TRUE)
+test.df = subset(df, sample == FALSE)
+
+### Applying logistic Regression ###
+head(train.df)
+mylogit <- glm(RR_cat ~ creditscore + dtiratio + ageofbuss + indrisk + corprisk + cashmargin + anurevenue_treated + operatingexp_treated + nsf + repymtrisk , data = train.df, family = "binomial")
+summary(mylogit)
+
+print(mylogit)
+
+### Using Stepwise model ###
+
+forward= step(mylogit)
+backward= step(mylogit)
+
+Summary(backward)
+
+### psudeo R squares###
+library(pscl)
+pR2(mylogit)
+
+### Classification percentage###
+
+S=predict(mylogit,type="response")
+print(S)
+
+
+# Run the model on the test set
+
+test.probs <-predict(mylogit, test.df, type='response')
+pred.logit <- rep('Zero',length(test.probs))
+pred.logit[test.probs>=0.5] <- 'One'
+
+table(pred.logit, test.df$RR_cat)
+
+### Confusion Matrix ###
+library(caret)
+confusionMatrix(test.df$RR_cat, pred.logit)
+###########################################################
+
+##Question 12-1
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/Study/Extra/fwdlinksforhelpcodeforadultdataandtimeseriesdata")
+data=read.csv("data.csv")
+df=data.frame(data)
+names(df)
+head(df)
+data.ts <- ts(df["travellers"], start = c(1949, 1), frequency = 12)
+str(data.ts)
+data.ts
+install.packages("ggfortify")
+##Question12-2 
+library(ggfortify)
+autoplot(data.ts, ts.geom = 'bar', fill = 'blue')
+autoplot(data.ts)
+##library(forecast)
+##model.arima <- auto.arima(data.ts)
+##passengers.forecast <- forecast(model.arima, level = c(95), h = 50)
+##autoplot(passengers.forecast)
+
+
+
+##Plot the time series
+#autoplot(data.ts) + labs(x ="Year-month", y = "Passenger numbers (1000's)", title="Air Passengers from 1949 to 1961") 
+
+##Question12-2 Box-Plot of the Data
+boxplot(data.ts~cycle(data.ts),xlab="Year-month", ylab = "Number of Passengers" ,main ="Monthly Air Passengers Boxplot from 1949 to 1961")
+
+##Question12-3 Decomposing the time series
+decomposedata.ts <- decompose(data.ts,"multiplicative")
+autoplot(decomposedata.ts)
+
+##Model Fitting
+##Question 12.4.1Trend Component
+t <- seq(1, 144, 1)
+modelTrend <- lm(formula = decomposedata.ts$trend ~ t)
+predT <- predict.lm(modelTrend, newdata = data.frame(t))
+
+plot(decomposedata.ts$trend[7:138] ~ t[7:138], ylab="T(t)", xlab="t",
+     type="p", pch=20, main = "Trend Component: Modelled vs Observed")
+lines(predT, col="red")
+
+layout(matrix(c(1,2,3,4),2,2))
+plot(modelTrend)
+summary(modelTrend)
+
+##Therefore, the relationship between trend and time can be expressed as:
+##T(t)=2.667t+84.648
+##And so for 1961 (time 145 to 156 inc.), the trend component (T) is:
+
+Data1961 <- data.frame("T" = 2.667*seq(145, 156, 1) + 84.648, S=rep(0,12), e=rep(0,12),
+                       row.names = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+Data1961
+
+
+
+##Question 12.4.2 Seasonal Component
+decomposedata.ts$seasonal
+Data1961$S <- unique(decomposedata.ts$seasonal)
+Data1961
+
+##Question 12.4.3 Seasonal Component
+plot(density(decomposedata.ts$random[7:138]),
+     main="Random Error")
+
+
+##Test for Stationarity (Optional)
+install.packages(c("tseries"))
+library(tseries)
+
+adf.test(data.ts)
+
+
+# Review random time series for any missing values
+#decomposedata.ts$random 
+
+##Question12.5 and 12.6 Forecast using Arima
+library(forecast)
+arimaAP <- auto.arima(data.ts)
+arimaAP
+##Forecast For 1961
+data.ts$forecastAP <- forecast(arimaAP, level = c(95), h = 12)
+autoplot(data.ts$forecastAP)
+data.ts$forecastAP
+###############################################
+setwd("E:/Backupdata 047/Anand Lap047_Backup1/Presntation/logistic Regression/SIP 11may2018")
+data1=read.csv("fuw.csv")
+data.df=data.frame(data1)
+names(data.df)
+
+
+###datauwba BA_new
+library(Deducer)
+model1= glm(RR_cat ~  bauwcat+ avgnsf.uw , data = data.df , family = binomial("logit") )
+
+summary(model1)
+rocplot(model1)
+data.df$pred1 = predict.glm(model1, data.df, type = c("response"))
+data.df$RRcat_pred <- ifelse(data.df$pred1 < 0.5, 0, 1)
+table(data.df$RRcat_pred)
+table(data.df$RR_cat, data.df$RRcat_pred)
+exp(coefficients(model1))
+######################################################
+#K-Means Clustering
+Trips = read.csv(file = "C:\\Users\\admin\\Desktop\\Analytics Edge-2015\\Week10 Final Exam\\HubwayTrips.csv")
+names(Trips)
+summary(Trips$Duration)
+
+#average duration of trips taken on weekdays & non-weekdays
+tapply(Trips$Duration, Trips$Weekday, mean)
+
+
+#Normalizing the data using caret package. for each variable, the normalization process subtracts the mean and divides
+#by the standard deviation.In the normalized dataset, all of the variables should have mean 0 and standard deviation 1
+library(caret)
+preproc = preProcess(Trips)
+TripsNorm = predict(preproc, Trips)
+
+#Maximum value of trip duration in the normalized dataset
+max(TripsNorm$Duration)
+
+
+#Kmeans function takes three arguement, input we're trying to cluster (TripsNorm) here), no. of clusters(10 here) and
+#maximum no. of iterations. we've chosen 1000 iterations
+set.seed(5000)
+KMCTrips = kmeans(TripsNorm, centers=10, iter.max=1000)
+
+str(KMCTrips)
+#Here cluster variable shows the numbers assigned to cluster from 1-10
+#centers is basically mean intensity for all the 10 clusters like we found out using tapply in h-clusters
+#Size shows the no. of elements in clusters. As we can see 2nd cluster has highest 36,409 elements
+
+
+#ORR
+#No. of elements in each Clsuter
+table(KMCTrips$size)
+
+#Creating different subsets for all the clusters
+TripsKMC1 = subset(TripsNorm, KMCTrips$cluster == 1)
+TripsKMC2 = subset(TripsNorm, KMCTrips$cluster == 2)
+TripsKMC3 = subset(TripsNorm, KMCTrips$cluster == 3)
+TripsKMC4 = subset(TripsNorm, KMCTrips$cluster == 4)
+TripsKMC5 = subset(TripsNorm, KMCTrips$cluster == 5)
+TripsKMC6 = subset(TripsNorm, KMCTrips$cluster == 6)
+TripsKMC7 = subset(TripsNorm, KMCTrips$cluster == 7)
+TripsKMC8 = subset(TripsNorm, KMCTrips$cluster == 8)
+TripsKMC9 = subset(TripsNorm, KMCTrips$cluster == 9)
+TripsKMC10 = subset(TripsNorm, KMCTrips$cluster == 10)
+
+#########################################################
